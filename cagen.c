@@ -16,7 +16,7 @@ void scale_grid(char *new, const char *old, int x, int y, int scale)
   {
     for (j = 0; j < x/scale; j++)
       for (k = 0; k < scale; k++)
-        new[i*scale*x+j*scale+k] = old[i*x+j];
+        new[i*scale*x+j*scale+k] = old[i*x+(j+(x/2-x/2/scale))];
     for (l = 1; l < scale; l++)
       memcpy(new+i*scale*x+l*x, new+i*scale*x, x);
   }
@@ -61,6 +61,8 @@ int main(int argc, char **argv)
   int elemrule = 30;
   int rand_seed = 0;
   
+  int ss_flag = 0;
+  
   memset(grid, 0, w*h);
   
   while ((c = getopt(argc, argv, "l:e:s:d:f:b:r")) != -1)
@@ -79,10 +81,10 @@ int main(int argc, char **argv)
                 scale = pow(2, scale-1);
                 break;
       case 'f': sscanf(optarg, "%d,%d,%d",
-                       fgcolor.r, fgcolor.g, fgcolor.b);
+                       &fgcolor.r, &fgcolor.g, &fgcolor.b);
                 break;
       case 'b': sscanf(optarg, "%d,%d,%d",
-                       bgcolor.r, bgcolor.g, bgcolor.b);
+                       &bgcolor.r, &bgcolor.g, &bgcolor.b);
                 break;
       case 'r': rand_seed = 1;
                 break;
@@ -94,7 +96,12 @@ int main(int argc, char **argv)
 
   while (1)
   {
-    if (SDL_PollEvent(&event) && event.type == SDL_KEYDOWN) break;
+    if (SDL_PollEvent(&event))
+    {
+      if (event.type == SDL_KEYDOWN) break;
+      if (event.type == SDL_MOUSEBUTTONDOWN) ss_flag =1;
+    }
+  
     
     if (ca_type == LIFE)
     {
@@ -110,6 +117,8 @@ int main(int argc, char **argv)
         if (scaled[i*w+j])
          set_pixel(screen, j, i, &fgcolor);
         
+    if (ss_flag) SDL_SaveBMP(screen, "screenshot.bmp");
+      
     SDL_Flip(screen);
     SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, bgcolor.r, bgcolor.g, bgcolor.b));
   }
