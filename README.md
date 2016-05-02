@@ -2,6 +2,9 @@
 
 CAgen draws elementary and life-like cellular automata on a display. This program is intended to be a screensaver on GNU/Linux.
 
+##Build
+Compile with `gcc -o cagen lifeca.c elemca.c cagen.c -lm -lSDL`
+
 ##Usage
 ```
 cagen [OPTIONS]`
